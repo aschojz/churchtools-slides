@@ -2,12 +2,8 @@
 import QRCode from 'qrcode';
 import { onMounted, ref } from 'vue';
 import Container from '../components/Container.vue';
-import {
-    fontAwesome,
-    normalFont,
-    scale,
-    titleFont,
-} from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 
 const props = defineProps<{
     title?: string;
@@ -57,6 +53,8 @@ const generateQR = async (text: string) => {
     }
 };
 
+const { font, titleFont, fontAwesome } = useFonts();
+
 const containerRef = ref();
 defineExpose({ containerRef });
 </script>
@@ -91,18 +89,18 @@ defineExpose({ containerRef });
                     x: 950 / scale,
                 }"
             />
-            <v-text :config="{ ...fontAwesome, text: icon }" />
+            <v-text :config="{ ...fontAwesome(), text: icon }" />
             <v-text
                 ref="titleRef"
                 :config="{
-                    ...titleFont,
+                    ...titleFont(),
                     text: title,
                     y: 430 / scale,
                 }"
             />
             <v-text
                 :config="{
-                    ...normalFont,
+                    ...font(undefined, 0.7),
                     lineHeight: 1.1,
                     text: subtitle,
                     y: (450 + titleHeight * scale) / scale,

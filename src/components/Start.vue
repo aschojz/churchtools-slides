@@ -3,6 +3,7 @@ import { CTEvent } from '@churchtools/utils';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { computed, onBeforeUpdate, onMounted, ref, watch } from 'vue';
+import useDeepl from '../composables/useDeeple';
 import { useStore } from '../store';
 import { slides } from './config';
 
@@ -121,15 +122,33 @@ const layoutToRefs = (e) => {
     }
 };
 onBeforeUpdate(() => (layoutRefs.value = []));
+
+const { getTranslation } = useDeepl();
+const translate = async () => {
+    const translation = await getTranslation(store.subtitle.de, 'en-GB');
+    store.subtitle.en = translation;
+    const translationEs = await getTranslation(store.subtitle.de, 'es');
+    store.subtitle.es = translationEs;
+};
 </script>
 
 <template>
     <div class="home">
-        <div class="flex gap-6 p-6">
-            Untertitel
-            <input v-model="store.subtitle.de" placeholder="deutsch" />
-            <input v-model="store.subtitle.en" placeholder="english" />
-            <input v-model="store.subtitle.es" placeholder="espganol" />
+        <div class="flex gap-6 p-6 items-start">
+            <div class="flex flex-col gap-1 items-start">
+                Untertitel
+                <input v-model="store.subtitle.de" placeholder="deutsch" />
+                <input v-model="store.subtitle.en" placeholder="english" />
+                <input v-model="store.subtitle.es" placeholder="espganol" />
+                <button :disabled="!store.subtitle.de" @click="translate">
+                    Übersetzen
+                </button>
+            </div>
+            <label class="flex items-center gap-1">
+                <input v-model="store.subtitleIsTitle" type="checkbox" />
+                <span>als Titel verwenden</span>
+            </label>
+            <input v-model="store.color" />
         </div>
         <template v-for="(layout, index) in layouts" :key="index">
             <component

@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { churchtoolsClient } from '@churchtools/churchtools-client';
+import { computed, ref, watch } from 'vue';
 import Container from '../components/Container.vue';
-import {
-    normalFont,
-    scale,
-    secondaryFont,
-    titleFont,
-} from '../components/helper.js';
+import { scale } from '../components/helper.js';
 import useChurchTools from '../composables/useChurchTools';
+import { useFonts } from '../composables/useFonts';
 import { useStore } from '../store';
 
 defineProps<{
@@ -16,16 +13,15 @@ defineProps<{
 
 const { dayMonth } = useChurchTools();
 
+const { font, titleFont, secondaryFont } = useFonts();
 const fontConfig = computed(() => ({
-    ...normalFont,
-    fill: 'rgb(255,255,255)',
-    fontSize: 65 / scale,
+    ...font(65),
     lineHeight: 1.3,
 }));
 
 const store = useStore();
 const currentEventIndex = computed(() =>
-    events.value.findIndex((e) => e.id === store.currentEvent.id)
+    events.value.findIndex((e) => e.id === store.currentEvent?.id)
 );
 const events = computed(() =>
     store.events.filter((e) => {
@@ -35,17 +31,35 @@ const events = computed(() =>
         );
     })
 );
+watch(currentEventIndex, () => init());
+const event1 = ref();
+const event2 = ref();
+const init = async () => {
+    const ceIndex = currentEventIndex.value;
+    const e1 = events.value[ceIndex + 1];
+    const e2 = events.value[ceIndex + 2];
+    if (e1 && e2) {
+        event1.value = await churchtoolsClient.get(`/events/${e1.id}`);
+        event2.value = await churchtoolsClient.get(`/events/${e2.id}`);
+    }
+};
 const nextSundays = computed(() => {
     if (!store.currentEvent) {
         return '';
     }
-    const ceIndex = currentEventIndex.value;
-    return `${dayMonth(events.value[ceIndex + 1]?.startDate)} – ${
-        events.value[ceIndex + 1]?.name
-    } \n${dayMonth(events.value[ceIndex + 2]?.startDate)} – ${
-        events.value[ceIndex + 2]?.name
-    }`;
+    return `${transformEvent(event1.value)}\n${transformEvent(event2.value)}`;
 });
+
+const transformEvent = (event: any) => {
+    const names = (event?.name ?? '').split('•').slice(0, 2);
+    if (names.length === 1 && names[0] === 'Gottesdienst') {
+        let sermon =
+            event?.eventServices.find((s) => s.serviceId === 1)?.name ?? '';
+        sermon = sermon.split('(')[0].trim();
+        names.push(`mit ${sermon}`);
+    }
+    return `${dayMonth(event?.startDate)} – ${names.join(' • ')}`;
+};
 
 const containerRef = ref();
 defineExpose({ containerRef });
@@ -57,7 +71,7 @@ defineExpose({ containerRef });
         <v-layer :config="{ x: 200 / scale, y: 150 / scale }">
             <v-text
                 :config="{
-                    ...titleFont,
+                    ...titleFont(),
                     text: 'Gottes Segen \nfür die nächste Woche!',
                 }"
             />
@@ -70,7 +84,7 @@ defineExpose({ containerRef });
             />
             <v-text
                 :config="{
-                    ...secondaryFont,
+                    ...secondaryFont(),
                     text: 'Nächste Gottesdienste (mit Livestream)',
                     y: 600 / scale,
                 }"

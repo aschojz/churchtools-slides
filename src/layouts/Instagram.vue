@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import Container from '../components/Container.vue';
-import { condensedFont, scale } from '../components/helper.js';
+import { scale } from '../components/helper.js';
 import useChurchTools from '../composables/useChurchTools';
+import { useFonts } from '../composables/useFonts';
 import useKonva from '../composables/useKonva';
 import { useStore } from '../store';
 
@@ -33,7 +34,10 @@ onMounted(async () => {
     }, 1000);
 });
 
-watch([() => store.subtitle.de, () => store.subtitle.en], () => init());
+watch(
+    [() => store.subtitle.de, () => store.subtitle.en, () => store.subtitle.es],
+    () => init()
+);
 
 const titleRef = ref();
 const titleHeight = ref(0);
@@ -49,7 +53,7 @@ const init = () => {
 };
 
 const { dayMonth } = useChurchTools();
-
+const { font, fontAwesomeBrands, titleFont } = useFonts();
 const date = computed(() => dayMonth(store.currentEvent?.startDate));
 
 const containerRef = ref();
@@ -76,29 +80,35 @@ defineExpose({ containerRef });
                     image: cross,
                     width: 100 / scale,
                     height: 100 / scale,
+                    opacity: 0.7,
                     x: 840 / scale,
                     y: 100 / scale,
                 }"
             />
-            <v-image
+            <v-text
                 :config="{
-                    image: youtube,
-                    opacity: 0.7,
-                    width: 300 / scale,
-                    height: 210 / scale,
-                    y: 1450 / scale,
-                    x: 140 / scale,
+                    ...fontAwesomeBrands(280),
+                    text: '',
+                    y: 1415 / scale,
+                    x: 130 / scale,
                 }"
             />
         </v-layer>
         <v-layer :config="{ x: 140 / scale, y: 1250 / scale }">
             <v-text
+                v-if="store.subtitleIsTitle"
+                :config="{
+                    ...titleFont(130),
+                    text: subtitle,
+                    y: -100,
+                }"
+            />
+            <v-text
+                v-else
                 ref="titleRef"
                 :config="{
-                    fontFamily: 'MyriadPro-Light',
-                    fill: 'rgba(255,255,255,0.9)',
+                    ...font(65, 0.9, 'light'),
                     text: subtitle,
-                    fontSize: 65 / scale,
                     y: 0 / scale,
                 }"
             />
@@ -107,26 +117,21 @@ defineExpose({ containerRef });
             <v-text
                 ref="titleRef"
                 :config="{
-                    ...condensedFont,
+                    ...font(90, 1, 'condensed'),
                     text: title,
-                    fontSize: 90 / scale,
                     y: 0 / scale,
                 }"
             />
             <v-text
                 :config="{
-                    fontFamily: 'MyriadPro-LightCond',
-                    fontSize: 60 / scale,
-                    fill: 'rgba(255,255,255,0.75)',
+                    ...font(60, 0.75, 'light-condensed'),
                     text: `${date} - ${time}`,
                     y: 90 / scale,
                 }"
             />
             <v-text
                 :config="{
-                    fontFamily: 'MyriadPro-LightCond',
-                    fontSize: 50 / scale,
-                    fill: 'rgba(255,255,255,0.75)',
+                    ...font(50, 0.75, 'light-condensed'),
                     text: place,
                     y: 160 / scale,
                 }"

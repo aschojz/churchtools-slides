@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import Container from '../components/Container.vue';
-import { scale, titleFont } from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 import useKonva from '../composables/useKonva';
 import { useStore } from '../store';
 
@@ -35,6 +36,8 @@ onMounted(() => {
     createImg('./donation.png', donationImage);
 });
 
+const { titleFont } = useFonts();
+
 const containerRef = ref();
 defineExpose({ containerRef });
 </script>
@@ -45,8 +48,7 @@ defineExpose({ containerRef });
         <v-layer :config="{ x: 200 / scale, y: 150 / scale }">
             <v-text
                 :config="{
-                    ...titleFont,
-                    fontSize: 70 / scale,
+                    ...titleFont(70),
                     text: `Mit Deiner Spende unterstützt Du: \n${donation}`,
                 }"
             />

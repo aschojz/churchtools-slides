@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import Container from '../components/Container.vue';
-import { normalFont, scale, titleFont } from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 import useKonva from '../composables/useKonva';
 
 const props = defineProps<{
@@ -24,10 +25,9 @@ const init = () => {
     text.value = props.text ?? ([] as string[]);
 };
 
+const { font, titleFont } = useFonts();
 const fontConfig = computed(() => ({
-    ...normalFont,
-    fill: 'rgb(255,255,255)',
-    fontSize: 52 / scale,
+    ...font(52),
     lineHeight: 1.3,
 }));
 
@@ -41,7 +41,7 @@ defineExpose({ containerRef });
         <v-layer :config="{ x: 200 / scale, y: 150 / scale }">
             <v-text
                 :config="{
-                    ...titleFont,
+                    ...titleFont(),
                     text: 'Translation - Traducción -  перевод',
                 }"
             />

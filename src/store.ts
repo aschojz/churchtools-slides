@@ -21,13 +21,16 @@ export const useStore = defineStore('main', () => {
     };
 
     const subtitle = reactive({
-        de: '',
+        de: 'Pfingsten',
         en: '',
         es: '',
     });
-    const color = ref('255,0,0');
+    const subtitleIsTitle = ref(true);
+
+    const color = ref('69,26,3');
 
     return {
+        subtitleIsTitle,
         subtitle,
         loadEvents,
         events,

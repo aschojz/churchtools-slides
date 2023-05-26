@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import Container from '../components/Container.vue';
-import { normalFont, scale } from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 import { useStore } from '../store';
 
 defineProps<{
@@ -9,14 +10,7 @@ defineProps<{
 }>();
 
 const store = useStore();
-
-const fontConfig = computed(() => ({
-    ...normalFont,
-    fill: 'rgb(255,255,255)',
-    fontFamily: 'MyriadPro-Light',
-    fontSize: 52 / scale,
-    lineHeight: 1.3,
-}));
+const { font, titleFont } = useFonts();
 
 const containerRef = ref();
 defineExpose({ containerRef });
@@ -27,8 +21,18 @@ defineExpose({ containerRef });
         <template #config> </template>
         <v-layer :config="{ x: 240 / scale, y: 620 / scale }">
             <v-text
+                v-if="store.subtitleIsTitle"
                 :config="{
-                    ...fontConfig,
+                    ...titleFont(130),
+                    text: store.subtitle.de,
+                    y: -100,
+                }"
+            />
+            <v-text
+                v-else
+                :config="{
+                    ...font(52, 1, 'light'),
+                    lineHeight: 1.3,
                     text: store.subtitle.de,
                 }"
             />

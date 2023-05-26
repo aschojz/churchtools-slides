@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import Container from '../components/Container.vue';
-import { normalFont, scale } from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 import useKonva from '../composables/useKonva';
 import { useStore } from '../store';
 
@@ -27,6 +28,8 @@ const init = () => {
     subtitle.value = store.subtitle.de ?? '';
 };
 
+const { font, titleFont } = useFonts();
+
 const containerRef = ref();
 defineExpose({ containerRef });
 </script>
@@ -46,11 +49,17 @@ defineExpose({ containerRef });
         </template>
         <v-layer :config="{ x: 90 / scale, y: 680 / scale }">
             <v-text
+                v-if="store.subtitleIsTitle"
                 :config="{
-                    ...normalFont,
-                    fontSize: 100 / scale,
-                    fill: 'rgb(255,255,255)',
-                    fontFamily: 'MyriadPro-Light',
+                    ...titleFont(130),
+                    text: store.subtitle.de,
+                    y: -200,
+                }"
+            />
+            <v-text
+                v-else
+                :config="{
+                    ...font(100, 1, 'light'),
                     text: subtitle,
                 }"
             />

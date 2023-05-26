@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import Container from '../components/Container.vue';
-import { normalFont, scale } from '../components/helper.js';
+import { scale } from '../components/helper.js';
+import { useFonts } from '../composables/useFonts';
 import useKonva from '../composables/useKonva';
 
 const props = defineProps<{
@@ -11,7 +12,8 @@ const props = defineProps<{
 
 const { createImg } = useKonva();
 const image = ref(),
-    subtitle = ref('');
+    subtitle = ref(''),
+    title = ref('');
 onMounted(() => {
     createImg('./bauchbinde.png', image);
     init();
@@ -21,6 +23,7 @@ watch(
     () => init()
 );
 const init = () => {
+    title.value = props.name ?? '';
     if (
         props.name === 'Alexander Gimbel' ||
         props.name === 'Christian Bouillon'
@@ -28,10 +31,15 @@ const init = () => {
         subtitle.value = 'Pastor FeG Karlsruhe';
     } else if (props.name === 'Jorge Krist') {
         subtitle.value = 'Jugendreferent FeG Karlsruhe';
+    } else if (props.name?.includes('(')) {
+        subtitle.value = props.name?.split('(')[1].split(')')[0];
+        title.value = props.name?.split('(')[0];
     } else {
         subtitle.value = '';
     }
 };
+
+const { font } = useFonts();
 
 const containerRef = ref();
 defineExpose({ containerRef });
@@ -48,17 +56,15 @@ defineExpose({ containerRef });
         <v-layer :config="{ x: 150 / scale }">
             <v-text
                 :config="{
-                    ...normalFont,
-                    fill: 'rgb(255,255,255)',
-                    text: name?.toLocaleUpperCase(),
+                    ...font(),
+                    text: title?.toLocaleUpperCase(),
                     y: (subtitle ? 945 : 965) / scale,
                 }"
             />
             <v-text
                 v-if="subtitle"
                 :config="{
-                    ...normalFont,
-                    fontSize: 34 / scale,
+                    ...font(34, 0.7),
                     text: subtitle,
                     y: 1015 / scale,
                 }"

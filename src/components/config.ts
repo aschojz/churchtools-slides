@@ -1,7 +1,7 @@
 export const slides = [
     {
         label: 'Predigt Titel',
-        export: ['titel.jpg'],
+        export: ['titel.jpg', '0_sonstiges/predigt_titel.jpg'],
         layout: 'Title',
         bind: {
             image: './title.jpg',

@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "@churchtools/utils": "^0.3.11",
+        "deepl-node": "^1.9.0",
         "html2canvas": "^1.4.1",
         "konva": "^9.0.2",
         "pinia": "^2.0.36",
