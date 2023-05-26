@@ -1,6 +1,6 @@
 import * as deepl from 'deepl-node';
 
-const authKey = '4a9e0b57-a14b-879a-c5db-b7748266ff84:fx';
+const authKey = import.meta.env.VITE_DEEPL_AUTH_KEY;
 
 export default function useDeepl() {
     const getTranslation = async (
